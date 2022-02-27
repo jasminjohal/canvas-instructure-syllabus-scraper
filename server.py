@@ -1,5 +1,5 @@
 from flask import Flask
-from scraper import scrape_canvas
+from scraper import get_syllabus_content, convert_syllabus_to_df
 import json
 
 app = Flask(__name__)
@@ -9,6 +9,6 @@ app = Flask(__name__)
 def hello_world():
     CS361_URL = 'https://oregonstate.instructure.com/courses/1877222/assignments/syllabus'
     # CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'
-    syllabus = scrape_canvas(CS361_URL)
-    stringified_syllabus = json.dumps(syllabus)
-    return stringified_syllabus
+    syllabus = get_syllabus_content(CS361_URL)
+    df = convert_syllabus_to_df(syllabus)
+    return '<p>testing</p>'

@@ -5,12 +5,19 @@ from selenium import webdriver
 import pandas as pd
 
 
-def scrape_canvas(url):
+def get_syllabus_content(url):
     driver = webdriver.Chrome()
     driver.get(url)
     html = driver.page_source
     soup = BeautifulSoup(html, "html.parser")
     driver.quit()
+    return soup
+
+
+def convert_syllabus_to_df(soup):
+    if not soup:
+        return
+
     table = soup.find(id="syllabus")
 
     # strip out extraneous trailing info, screenreader content, and calendar icons
@@ -53,10 +60,12 @@ def scrape_canvas(url):
 
     syllabus_df = pd.DataFrame(
         {'Tasks': tasks, 'Dates': dates, 'Times': times})
-    print(syllabus_df)
+    return syllabus_df
 
 
 if __name__ == "__main__":
     CS361_URL = 'https://oregonstate.instructure.com/courses/1877222/assignments/syllabus'
     CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'
-    rows = scrape_canvas(CS361_URL)
+    html = get_syllabus_content(CS372_URL)
+    df = convert_syllabus_to_df(html)
+    print(df)
