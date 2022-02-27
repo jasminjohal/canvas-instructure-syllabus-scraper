@@ -7,14 +7,13 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello_world():
-    return '<h1>Hello world!</h1>'
+    return '<p>CS 361 ID: 1877222</p><p>CS 372 ID: 1830291</p>'
 
 
-@app.route("/todoist")
-def todoist():
-    CS361_URL = 'https://oregonstate.instructure.com/courses/1877222/assignments/syllabus'
-    # CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'
-    syllabus = get_syllabus_content(CS361_URL)
+@app.route("/todoist/<int:class_id>")
+def todoist(class_id):
+    URL = f'https://oregonstate.instructure.com/courses/{class_id}/assignments/syllabus'
+    syllabus = get_syllabus_content(URL)
     df = convert_syllabus_to_df(syllabus)
     todoist_df = process_df_for_todoist(df)
     return Response(
