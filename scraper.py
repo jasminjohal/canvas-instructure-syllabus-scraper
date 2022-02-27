@@ -63,9 +63,36 @@ def convert_syllabus_to_df(soup):
     return syllabus_df
 
 
+def process_df_for_todoist(df):
+    # remove non-ASCII characters
+    # df.replace({r'[^\x00-\x7F]+': ' '}, regex=True, inplace=True)
+
+    df = df.rename(columns={"Dates": "DATE", "Tasks": "CONTENT"})
+
+    # requisite columns for Todoist import
+    df['TYPE'] = "task"
+    df['PRIORITY'] = 4
+    df['INDENT'] = ""
+    df['AUTHOR'] = ""
+    df['RESPONSIBLE'] = ""
+    df['DATE_LANG'] = "en"
+    df['TIMEZONE'] = ""
+
+    # get time from 'Due' column and concatenate to 'DATE'
+    df['Times'] = df['Times'].str.replace(
+        'due by ', '', regex=True).str.strip()
+    df['DATE'] = df['DATE'] + " @ " + df['Times']
+
+    # reorder columns and output to csv
+    df = df[['TYPE', 'CONTENT', 'PRIORITY', 'INDENT', 'AUTHOR',
+             'RESPONSIBLE', 'DATE', 'DATE_LANG', 'TIMEZONE']]
+    return df
+
+
 if __name__ == "__main__":
     CS361_URL = 'https://oregonstate.instructure.com/courses/1877222/assignments/syllabus'
     CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'
     html = get_syllabus_content(CS372_URL)
     df = convert_syllabus_to_df(html)
-    print(df)
+    todoist_df = process_df_for_todoist(df)
+    print(todoist_df)
