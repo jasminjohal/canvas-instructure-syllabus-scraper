@@ -1,10 +1,7 @@
-<!-- {% extends 'index.html' %} -->
-
-<!-- {% block body %} -->
-<p class="success">Successfully scraped the syllabus from <a href="{{ course_url }}">{{ course_url }}</a>! Click the
+<p class="success">Successfully scraped and processed the syllabus from <a href="{{ course_url }}">{{ course_name
+        }}</a>! Click the
     download button to download the
-    CSV file that can be imported into {{
-    tms }}.</p>
+    CSV file that can be imported into <strong>{{
+        tms }}</strong>.</p>
 <a href="/download"><button>Download</button></a>
 <p><a href="/">Go back</a> to scrape another course.</p>
-<!-- {% endblock %} -->

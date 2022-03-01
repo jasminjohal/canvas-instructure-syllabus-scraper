@@ -17,6 +17,12 @@ def get_syllabus_content(url):
     return soup
 
 
+def get_course_name(soup):
+    header = soup.find_all("a", {'class': 'mobile-header-title expandable'})[0]
+    course_name = header.find('div').text
+    return course_name
+
+
 def convert_syllabus_to_df(soup):
     if not soup:
         return
@@ -97,6 +103,7 @@ if __name__ == "__main__":
     CS361_URL = 'https://oregonstate.instructure.com/courses/1877222/assignments/syllabus'
     CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'
     html = get_syllabus_content(CS361_URL)
+    course_name = get_course_name(html)
     df = convert_syllabus_to_df(html)
     todoist_df = process_df_for_todoist(df)
     print(todoist_df)
