@@ -1,5 +1,3 @@
-import time
-import os
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import pandas as pd
@@ -8,6 +6,7 @@ import pandas as pd
 def get_syllabus_content(url):
     driver = webdriver.Chrome()
     driver.get(url)
+    # TODO: force browser to wait until page loads
     html = driver.page_source
     soup = BeautifulSoup(html, "html.parser")
     driver.quit()
@@ -20,9 +19,10 @@ def convert_syllabus_to_df(soup):
 
     table = soup.find(id="syllabus")
 
-    # strip out extraneous trailing info, screenreader content, and calendar icons
-    for div in table.find_all("div", {'class': 'special_date_title'}):
-        div.decompose()
+    # strip out duplicate tasks, screenreader content, and calendar icons
+    for tr in table.find_all("tr", {'class': 'special_date'}):
+        # removes duplicate (1 student), (3 students) rows
+        tr.decompose()
     for span in table.find_all("span", {'class': 'screenreader-only'}):
         span.decompose()
     for icon in table.find_all("i", {'class': 'icon-assignment'}):
@@ -92,7 +92,7 @@ def process_df_for_todoist(df):
 if __name__ == "__main__":
     CS361_URL = 'https://oregonstate.instructure.com/courses/1877222/assignments/syllabus'
     CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'
-    html = get_syllabus_content(CS372_URL)
+    html = get_syllabus_content(CS361_URL)
     df = convert_syllabus_to_df(html)
     todoist_df = process_df_for_todoist(df)
     print(todoist_df)
