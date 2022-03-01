@@ -10,7 +10,6 @@ def get_syllabus_content(url):
     options.add_argument("--log-level=3")  # disable console warnings/errors
     driver = webdriver.Chrome(options=options)
     driver.get(url)
-    # TODO: force browser to wait until page loads
     html = driver.page_source
     soup = BeautifulSoup(html, "html.parser")
     driver.quit()
