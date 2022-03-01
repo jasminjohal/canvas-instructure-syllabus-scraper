@@ -1,10 +1,14 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import pandas as pd
 
 
 def get_syllabus_content(url):
-    driver = webdriver.Chrome()
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--log-level=3")  # disable console warnings/errors
+    driver = webdriver.Chrome(options=options)
     driver.get(url)
     # TODO: force browser to wait until page loads
     html = driver.page_source

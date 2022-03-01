@@ -21,3 +21,7 @@ def todoist(class_id):
         mimetype="text/csv",
         headers={"Content-disposition":
                  "attachment; filename=syllabus_for_todoist.csv"})
+
+
+if __name__ == "__main__":
+    app.run()
