@@ -1,5 +1,5 @@
 from flask import Flask, Response, render_template, request
-from scraper import get_course_name, get_syllabus_content, convert_syllabus_to_df, process_df_for_todoist
+from scraper import *
 
 app = Flask(__name__)
 
@@ -9,7 +9,7 @@ last_processed = None
 
 @app.route("/")
 def home():
-    return render_template('index.html')
+    return render_template('form.html')
 
 
 @app.route("/", methods=['POST'])
