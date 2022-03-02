@@ -54,6 +54,17 @@ h1 {
   font-size: 3rem;
 }
 
+#loading {
+  margin-top: 1rem;
+  display: none;
+}
+
+#loading img {
+  height: 40px;
+  margin: 0 auto;
+  display: block;
+}
+
 #go-back {
   margin-top: 1rem;
   margin-bottom: 0;

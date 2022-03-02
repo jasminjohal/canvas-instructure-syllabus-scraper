@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>Canvas Syllabus Scraper</h1>
-<form method="POST">
+<form method="POST" id="form">
     <div class="mb-3">
         <label for="course-url" class="form-label">Enter the URL for your course's syllabus page on
             Canvas:</label>
@@ -21,4 +21,7 @@
     </div>
     <button type="submit" class="btn btn-primary">Scrape</button>
 </form>
+<div id="loading">
+    <img src="https://c.tenor.com/5o2p0tH5LFQAAAAi/hug.gif" />
+</div>
 {% endblock %}
