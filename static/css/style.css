@@ -100,7 +100,7 @@ select:focus {
   background-color: var(--btn-secondary);
 }
 
-#error {
+.error {
   color: darkred;
 }
 

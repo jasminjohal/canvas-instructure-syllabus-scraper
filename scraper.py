@@ -28,6 +28,15 @@ def get_syllabus_content(url):
     return soup
 
 
+def validate_content(soup):
+    """Return True if the HTML content corresponds to a Canvas syllabus page;
+    False otherwise"""
+    header = soup.find_all("a", {'class': 'mobile-header-title expandable'})
+    if not header:
+        return False
+    return True
+
+
 def get_course_name(soup):
     header = soup.find_all("a", {'class': 'mobile-header-title expandable'})[0]
     course_name = header.find('div').text

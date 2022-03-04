@@ -8,7 +8,7 @@
 - [ ] Refactor code
 - [x] Add loading spinner
 - [ ] Error management
-  - [ ] Check if URL is valid
+  - [x] Check if URL is valid
 - [ ] Test against all available OSU CS syllabus pages
 - [ ] Test against non-OSU courses
 - [ ] Display tasks to user prior to download

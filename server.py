@@ -1,3 +1,4 @@
+from attr import validate
 from flask import Flask, Response, render_template, request
 from scraper import *
 
@@ -26,9 +27,12 @@ def todoist():
         if course_url not in courses:
             valid_url = check_if_url_is_valid(course_url)
             if not valid_url:
-                return render_template('form.html', error=True)
+                return render_template('form.html', invalid_url=True)
             courses[course_url] = {}
             syllabus = get_syllabus_content(course_url)
+            valid_syllabus = validate_content(syllabus)
+            if not valid_syllabus:
+                return render_template('form.html', error=True)
             course_name = get_course_name(syllabus)
             df = convert_syllabus_to_df(syllabus)
             courses[course_url]['raw'] = df
