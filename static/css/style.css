@@ -100,6 +100,10 @@ select:focus {
   background-color: var(--btn-secondary);
 }
 
+#error {
+  color: darkred;
+}
+
 #loading {
   margin-top: 1rem;
   display: none;

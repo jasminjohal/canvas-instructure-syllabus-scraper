@@ -1,7 +1,19 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import validators
 import pandas as pd
+
+
+def check_if_url_is_valid(url):
+    """Accept a URL and returns True if the URL is a valid Canvas syllabus URL;
+    False otherwise."""
+    valid_url = valid_canvas_url = True
+    if not validators.url(url):
+        valid_url = False
+    if ("instructure.com" not in url or "syllabus" not in url):
+        valid_canvas_url = False
+    return valid_url and valid_canvas_url
 
 
 def get_syllabus_content(url):

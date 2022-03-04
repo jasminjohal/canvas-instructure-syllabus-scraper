@@ -24,6 +24,9 @@ def todoist():
         tms = request.form['tms']
 
         if course_url not in courses:
+            valid_url = check_if_url_is_valid(course_url)
+            if not valid_url:
+                return render_template('form.html', error=True)
             courses[course_url] = {}
             syllabus = get_syllabus_content(course_url)
             course_name = get_course_name(syllabus)
