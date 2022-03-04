@@ -2,6 +2,8 @@
   --main-bg-color: #2c3e50;
   --dark-purple: #3f2b96;
   --light-purple: #a8c0ff;
+  --btn-primary: #16a085;
+  --btn-secondary: #1abc9c;
 }
 
 * {
@@ -11,7 +13,7 @@
 }
 
 body {
-  font-family: "Inter", sans-serif !important;
+  font-family: "Inter", sans-serif;
   background: linear-gradient(
     90deg,
     var(--dark-purple) 0%,
@@ -54,6 +56,7 @@ nav a:hover {
 
 h1 {
   font-size: 3rem;
+  font-weight: 500;
 }
 
 form {
@@ -89,12 +92,12 @@ select:focus {
   border-radius: 0.25rem;
   cursor: pointer;
   border: 1px solid transparent;
-  background-color: #16a085;
+  background-color: var(--btn-primary);
   color: white;
 }
 
 .btn:hover {
-  background-color: #1abc9c;
+  background-color: var(--btn-secondary);
 }
 
 #loading {
@@ -115,7 +118,7 @@ select:focus {
 
 #container {
   font-size: 1rem;
-  width: 900px;
+  width: 750px;
   margin: 0 auto;
   border-radius: 5px;
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
@@ -129,17 +132,13 @@ p {
   margin: 1rem 0;
 }
 
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 780px) {
   #container {
     width: 90%;
+    font-size: 0.9rem;
     padding: 2rem;
   }
-}
 
-@media screen and (max-width: 700px) {
-  #container {
-    font-size: 0.9rem;
-  }
   h1 {
     font-size: 2.4rem;
   }
@@ -161,7 +160,13 @@ p {
   #container {
     font-size: 0.8rem;
   }
+
   h1 {
     font-size: 1rem;
+  }
+
+  .btn,
+  .form-control {
+    font-size: 0.8rem;
   }
 }
