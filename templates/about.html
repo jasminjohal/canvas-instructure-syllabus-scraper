@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>About</h1>
+<p>This app is designed so that students don't have to manually enter in tasks into their task management systems at
+    the beginning of every quarter/semester. Just enter in the URL for your course's syllabus page on Canvas and the app
+    will scrape the syllabus and output a CSV that can be imported into the task management system of your choice
+    (Todoist or Asana). The CSV
+    contains the task name and due date for every
+    task on the syllabus.</p>
+<p>For guidance on how to import the CSV into Todoist or Asana, please refer to the documentation below:</p>
+<ul>
+    <li><a href="https://todoist.com/help/articles/importing-or-exporting-project-templates" target="_blank">Todoist
+            documentation</a></li>
+    <li><a href="https://asana.com/guide/help/api/csv-importer" target="_blank">Asana documentation</a></li>
+</ul>
+{% endblock %}

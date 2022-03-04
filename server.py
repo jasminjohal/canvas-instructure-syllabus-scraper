@@ -12,6 +12,11 @@ def home():
     return render_template('form.html')
 
 
+@app.route("/about")
+def about():
+    return render_template('about.html')
+
+
 @app.route("/", methods=['POST'])
 def todoist():
     if request.method == 'POST':
