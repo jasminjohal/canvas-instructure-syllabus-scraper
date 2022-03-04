@@ -6,6 +6,8 @@
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -54,6 +56,47 @@ h1 {
   font-size: 3rem;
 }
 
+form {
+  margin: 10px 0;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: white;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  margin: 10px 0;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--dark-purple);
+}
+
+.form-section {
+  margin: 1rem 0;
+}
+
+.btn {
+  padding: 0.45rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background-color: #16a085;
+  color: white;
+}
+
+.btn:hover {
+  background-color: #1abc9c;
+}
+
 #loading {
   margin-top: 1rem;
   display: none;
@@ -80,6 +123,10 @@ h1 {
   padding: 3rem;
   margin-top: 10rem;
   background-color: white;
+}
+
+p {
+  margin: 1rem 0;
 }
 
 @media screen and (max-width: 1000px) {
