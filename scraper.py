@@ -98,6 +98,32 @@ def process_df_for_todoist(df):
     return df
 
 
+def process_df_for_asana(df):
+    # remove non-ASCII characters
+    # df.replace({r'[^\x00-\x7F]+': ' '}, regex=True, inplace=True)
+
+    # rename column names
+    # place time in description since Asana does not support due time
+    df = df.rename(columns={"Dates": "Due Date",
+                   "Tasks": "Name", "Times": "Description"})
+
+    # requisite columns for Asana import
+    df['Assignee'] = ""
+    df['Collaborators'] = ""
+    df['Start Date'] = ""
+    df['Type'] = ""
+    df['Section/Column'] = ""
+
+    # convert date to format that Asana expects (e.g. 'Mon Sep 27, 2021' -> '9/27/21')
+    df['Due Date'] = pd.to_datetime(df['Due Date'], format='%a %b %d, %Y')
+
+    # reorder columns and output to csv
+    df = df[['Name', 'Description', 'Assignee', 'Collaborators',
+             'Due Date', 'Start Date', 'Type', 'Section/Column']]
+
+    return df
+
+
 if __name__ == "__main__":
     CS361_URL = 'https://oregonstate.instructure.com/courses/1877222/assignments/syllabus'
     CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'

@@ -32,10 +32,11 @@ def todoist():
             courses[course_url]['name'] = course_name
 
         if tms not in courses[course_url]:
+            df = courses[course_url]['raw']
             if tms == 'Todoist':
                 tms_df = process_df_for_todoist(df)
             elif tms == 'Asana':
-                pass
+                tms_df = process_df_for_asana(df)
             courses[course_url][tms] = tms_df
 
         global last_processed
