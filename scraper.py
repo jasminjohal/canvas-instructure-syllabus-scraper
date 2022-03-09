@@ -11,7 +11,7 @@ def check_if_url_is_valid(url):
     valid_url = valid_canvas_url = True
     if not validators.url(url):
         valid_url = False
-    if ("instructure.com" not in url or "syllabus" not in url):
+    if ("instructure" not in url or "canvas" not in url) and "syllabus" not in url:
         valid_canvas_url = False
     return valid_url and valid_canvas_url
 
@@ -126,7 +126,7 @@ def process_df_for_asana(df):
     # rename column names
     # place time in description since Asana does not support due time
     df = df.rename(columns={"Dates": "Due Date",
-                   "Tasks": "Name", "Times": "Description"})
+                            "Tasks": "Name", "Times": "Description"})
 
     # requisite columns for Asana import
     df['Assignee'] = ""
