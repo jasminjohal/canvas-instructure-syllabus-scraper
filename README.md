@@ -9,7 +9,18 @@
 - [x] Add loading spinner
 - [ ] Error management
   - [x] Check if URL is valid
-- [ ] Test against all available OSU CS syllabus pages
+- [x] Create expect outputs for all available OSU CS syllabus pages
+  - [x] CS325 (3 dates off)
+  - [x] CS271 (3 dates off)
+  - [x] CS261 (OK)
+  - [x] CS225 (OK)
+  - [x] CS372 (OK)
+  - [x] CS162 (4 dates off & bug for syllabus quiz date)
+  - [x] CS340 (3 dates off)
+  - [x] CS344 (3 dates off)
+  - [x] CS361 (OK)
+  - [x] CS290 (OK)
+- [ ] Fix bug(s) that causes discrepant outputs in above courses (HIGH PRIORITY)
 - [ ] Test against non-OSU courses
 - [ ] Display tasks to user prior to download
 - [ ] Deploy to Heroku
