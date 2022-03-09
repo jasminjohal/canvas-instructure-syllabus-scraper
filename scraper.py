@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import validators
 import pandas as pd
+from datetime import datetime
 
 
 def check_if_url_is_valid(url):
@@ -58,35 +59,40 @@ def convert_syllabus_to_df(soup):
     for icon in table.find_all("i", {'class': 'icon-assignment'}):
         icon.decompose()
 
-    last_date = None
     dates = []
     tasks = []
     times = []
 
     rows = table.find_all('tr')
-    for row in rows:
-        cells = row.find_all('td')
+    for row in rows[1:]:  # first row contains column names
+        # date is contained in class name (e.g. "events_2021_12_03")
+        classes = row['class']
+        found_date = False
+        for row_class in classes:
+            if "events_" in row_class:
+                found_date = True
 
-        # some rows only have 2 columns if multiple assignments are due on a given day
-        if len(cells) == 3:
-            td_count = 1
-        elif len(cells) == 2:
-            td_count = 2
-            dates.append(last_date)
+        if found_date:
+            task_date = classes[3].split('_')
+            year = task_date[1]
+            month = task_date[2]
+            day = task_date[3]
+            task_date = f'{month}/{day}/{year}'
+            # "09/27/2020" -> "Sun Sep 27, 2020"
+            task_date = datetime.strptime(
+                task_date, '%m/%d/%Y').strftime('%a %b %#d, %Y')  # THIS IS ONLY VALID FOR WINDOWS!
+        # some tasks do not have due dates
+        else:
+            task_date = ''
 
-        for cell in cells:
-            cur_text = cell.text.strip().replace('\n', '')
-            # date column (contains due date)
-            if td_count == 1:
-                dates.append(cur_text)
-                last_date = cur_text
-            # details column (contains task name)
-            elif td_count == 2:
-                tasks.append(cur_text)
-            # due column (contains due by time)
-            elif td_count == 3:
-                times.append(cur_text)
-            td_count += 1
+        task_name = row.find_all('td', {'class': 'name'})[
+            0].text.strip().replace('\n', '')
+        task_time = row.find_all('td', {'class': 'dates'})[
+            0].text.strip().replace('\n', '')
+
+        dates.append(task_date)
+        tasks.append(task_name)
+        times.append(task_time)
 
     syllabus_df = pd.DataFrame(
         {'Tasks': tasks, 'Dates': dates, 'Times': times})
@@ -152,4 +158,5 @@ if __name__ == "__main__":
     course_name = get_course_name(html)
     df = convert_syllabus_to_df(html)
     todoist_df = process_df_for_todoist(df)
+    todoist_df.to_csv('test.csv')
     print(todoist_df)

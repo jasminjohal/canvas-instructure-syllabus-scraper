@@ -35,6 +35,7 @@ def todoist():
                 return render_template('form.html', error=True)
             course_name = get_course_name(syllabus)
             df = convert_syllabus_to_df(syllabus)
+            # df.to_csv(f'./df/{course_name}_df.csv', index=False)
             courses[course_url]['raw'] = df
             courses[course_url]['name'] = course_name
 

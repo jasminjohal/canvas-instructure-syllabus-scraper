@@ -47,7 +47,19 @@ class TestClass(unittest.TestCase):
             syllabus = get_syllabus_content(course_url)
             course_name = get_course_name(syllabus)
             df = convert_syllabus_to_df(syllabus)
-            expected_df = pd.read_csv(f'./df/{course_name}_df.csv')
+            # keep_default_na interprets empty cells as empty strings
+            expected_df = pd.read_csv(
+                f'./df/{course_name}_df.csv', keep_default_na=False)
+            print(f"Testing {course_name}...")
+
+            # output df differences (verbose)
+            # result = df.compare(expected_df, align_axis=0,
+            #                     keep_shape=True, keep_equal=True)
+            # result.to_csv('compare.csv')
+
+            # output df differences (concise)
+            # result = df.compare(expected_df)
+            # result.to_csv('compare.csv')
             self.assertTrue(df.equals(expected_df))
 
 

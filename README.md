@@ -9,6 +9,14 @@
 - [x] Add loading spinner
 - [ ] Error management
   - [x] Check if URL is valid
+  - [ ] Force browser to wait until table loads
+    ```html
+    <tr>
+      <td scope="row">
+        <img src="/images/ajax-reload-animated.gif" />
+      </td>
+    </tr>
+    ```
 - [x] Create expect outputs for all available OSU CS syllabus pages
   - [x] CS325 (3 dates off)
   - [x] CS271 (3 dates off)
