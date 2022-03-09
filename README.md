@@ -18,17 +18,18 @@
     </tr>
     ```
 - [x] Create expect outputs for all available OSU CS syllabus pages
-  - [x] CS325 (3 dates off)
-  - [x] CS271 (3 dates off)
+  - [x] CS325 (OK)
+  - [x] CS271 (OK)
   - [x] CS261 (OK)
   - [x] CS225 (OK)
   - [x] CS372 (OK)
-  - [x] CS162 (4 dates off & bug for syllabus quiz date)
-  - [x] CS340 (3 dates off)
-  - [x] CS344 (3 dates off)
+  - [x] CS162 (OK)
+  - [x] CS340 (OK)
+  - [x] CS344 (OK)
   - [x] CS361 (OK)
   - [x] CS290 (OK)
-- [ ] Fix bug(s) that causes discrepant outputs in above courses (HIGH PRIORITY)
+- [x] Fix bug(s) that causes discrepant outputs in above courses (HIGH PRIORITY)
 - [ ] Test against non-OSU courses
+  - [ ] Address instances where date range is given in 'Due' column (e.g. "6:15pm to 9:15pm" in https://canvas.northwestern.edu/courses/7060/assignments/syllabus)
 - [ ] Display tasks to user prior to download
 - [ ] Deploy to Heroku
