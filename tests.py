@@ -19,19 +19,6 @@ class TestClass(unittest.TestCase):
             'https://canvas.oregonstate.edu/courses/1784199/assignments/syllabus'  # cs325
         ]
 
-        self.course_names = [
-            'ANALYSIS OF ALGORITHMS (CS_325_400_F2020)',
-            'COMPUTER ARCH & ASSEM LANGUAGE (CS_271_X400_U2020)',
-            'DATA STRUCTURES (CS_261_400_S2020)',
-            'DISCRETE STRUCTURES IN CS (CS_225_401_F2019)',
-            'INTRO TO COMPUTER NETWORKS (CS_372_400_F2021)',
-            'INTRO TO COMPUTER SCIENCE I (CS_161_400_F2019)',
-            'INTRO TO COMPUTER SCIENCE II (CS_162_C400_W2020)',
-            'INTRODUCTION TO DATABASES (CS_340_400_F2020)',
-            'OPERATING SYSTEMS I (CS_344_400_W2021)',
-            'WEB DEVELOPMENT (CS_290_C400_S2020)'
-        ]
-
     def test_validator(self):
         # valid URL that doesn't point to a Canvas syllabus page should return False
         valid_url = check_if_url_is_valid('https://www.google.com/')
@@ -91,14 +78,6 @@ class TestClass(unittest.TestCase):
             expected_df = pd.read_csv(
                 f'./testing/df/{course_name}_df.csv', keep_default_na=False)
 
-            # output df differences (verbose)
-            # result = df.compare(expected_df, align_axis=0,
-            #                     keep_shape=True, keep_equal=True)
-            # result.to_csv('compare.csv')
-
-            # output df differences (concise)
-            # result = df.compare(expected_df)
-            # result.to_csv('compare.csv')
             self.assertTrue(df.equals(expected_df))
 
 

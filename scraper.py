@@ -174,5 +174,4 @@ if __name__ == "__main__":
     course_name = get_course_name(html)
     df = convert_syllabus_to_df(html)
     todoist_df = process_df_for_todoist(df)
-    todoist_df.to_csv('test.csv')
     print(todoist_df)
