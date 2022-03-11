@@ -9,6 +9,8 @@ from selenium.common.exceptions import TimeoutException
 import validators
 import pandas as pd
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()
 
 
 def check_if_url_is_valid(url):
@@ -31,7 +33,7 @@ def get_syllabus_content(url):
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(executable_path=os.environ.get(
-        "CHROMEDRIVER_PATH", ), options=options)
+        "CHROMEDRIVER_PATH"), options=options)
     driver.get(url)
     soup = None
     # force browser to wait <=10 seconds for content to load

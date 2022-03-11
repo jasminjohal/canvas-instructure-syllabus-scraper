@@ -2,6 +2,8 @@ import unittest
 from scraper import *
 import pandas as pd
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+load_dotenv()
 
 
 class TestClass(unittest.TestCase):

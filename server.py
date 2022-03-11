@@ -1,11 +1,10 @@
-from attr import validate
-from flask import Flask, Response, render_template, request
+from flask import Flask, Response, redirect, render_template, request, session, url_for
+from dotenv import load_dotenv
 from scraper import *
 
 app = Flask(__name__)
-
-courses = {}
-last_processed = None
+load_dotenv()
+app.secret_key = os.environ.get("SECRET_KEY")
 
 
 @app.route("/")
@@ -39,19 +38,22 @@ def todoist():
         elif tms == 'Asana':
             tms_df = process_df_for_asana(df)
 
-        global last_processed
-        last_processed = tms_df
-
+        session['df'] = tms_df.to_json()  # serialize df
         return render_template('download.html', tms=tms, course_url=course_url, course_name=course_name)
 
 
 @app.route("/download")
 def download():
-    return Response(
-        last_processed.to_csv(),
-        mimetype="text/csv",
-        headers={"Content-disposition":
-                 "attachment; filename=syllabus_tasks.csv"})
+    df = session.get('df')
+    if df:
+        df = pd.read_json(df)
+        return Response(
+            df.to_csv(),
+            mimetype="text/csv",
+            headers={"Content-disposition":
+                     "attachment; filename=syllabus_tasks.csv"})
+    else:
+        return redirect(url_for('home'))
 
 
 if __name__ == "__main__":
