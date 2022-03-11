@@ -24,32 +24,25 @@ def todoist():
         course_url = request.form['course_url']
         tms = request.form['tms']
 
-        if course_url not in courses:
-            valid_url = check_if_url_is_valid(course_url)
-            if not valid_url:
-                return render_template('form.html', invalid_url=True)
-            courses[course_url] = {}
-            syllabus = get_syllabus_content(course_url)
-            valid_syllabus = validate_content(syllabus)
-            if not valid_syllabus:
-                return render_template('form.html', error=True)
-            course_name = get_course_name(syllabus)
-            df = convert_syllabus_to_df(syllabus)
-            courses[course_url]['raw'] = df
-            courses[course_url]['name'] = course_name
+        valid_url = check_if_url_is_valid(course_url)
+        if not valid_url:
+            return render_template('form.html', invalid_url=True)
+        syllabus = get_syllabus_content(course_url)
+        valid_syllabus = validate_content(syllabus)
+        if not valid_syllabus:
+            return render_template('form.html', error=True)
+        course_name = get_course_name(syllabus)
+        df = convert_syllabus_to_df(syllabus)
 
-        if tms not in courses[course_url]:
-            df = courses[course_url]['raw']
-            if tms == 'Todoist':
-                tms_df = process_df_for_todoist(df)
-            elif tms == 'Asana':
-                tms_df = process_df_for_asana(df)
-            courses[course_url][tms] = tms_df
+        if tms == 'Todoist':
+            tms_df = process_df_for_todoist(df)
+        elif tms == 'Asana':
+            tms_df = process_df_for_asana(df)
 
         global last_processed
-        last_processed = courses[course_url][tms]
+        last_processed = tms_df
 
-        return render_template('download.html', tms=tms, course_url=course_url, course_name=courses[course_url]['name'])
+        return render_template('download.html', tms=tms, course_url=course_url, course_name=course_name)
 
 
 @app.route("/download")
