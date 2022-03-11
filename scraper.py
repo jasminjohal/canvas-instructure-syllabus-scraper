@@ -1,3 +1,4 @@
+import os
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -23,9 +24,13 @@ def check_if_url_is_valid(url):
 
 def get_syllabus_content(url):
     options = webdriver.ChromeOptions()
+    options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
     options.add_argument("--headless")
     options.add_argument("--log-level=3")  # disable console warnings/errors
-    driver = webdriver.Chrome(options=options)
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--no-sandbox")
+    driver = webdriver.Chrome(executable_path=os.environ.get(
+        "CHROMEDRIVER_PATH"), options=options)
     driver.get(url)
     soup = None
     # force browser to wait <=10 seconds for content to load
