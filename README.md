@@ -9,7 +9,7 @@
 - [x] Add loading spinner
 - [ ] Error management
   - [x] Check if URL is valid
-  - [ ] Force browser to wait until table loads (HIGH PRIORITY)
+  - [x] Force browser to wait until table loads (HIGH PRIORITY)
     ```html
     <tr>
       <td scope="row">
@@ -32,4 +32,4 @@
 - [ ] Test against non-OSU courses
   - [ ] Address instances where date range is given in 'Due' column (e.g. "6:15pm to 9:15pm" in https://canvas.northwestern.edu/courses/7060/assignments/syllabus)
 - [ ] Display tasks to user prior to download
-- [ ] Deploy to Heroku
+- [x] Deploy to Heroku
