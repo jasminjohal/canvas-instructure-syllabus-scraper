@@ -24,13 +24,14 @@ def check_if_url_is_valid(url):
 
 def get_syllabus_content(url):
     options = webdriver.ChromeOptions()
-    options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+    options.binary_location = os.environ.get("GOOGLE_CHROME_BIN", None)
     options.add_argument("--headless")
     options.add_argument("--log-level=3")  # disable console warnings/errors
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(executable_path=os.environ.get(
-        "CHROMEDRIVER_PATH"), options=options)
+        "CHROMEDRIVER_PATH", ), options=options)
     driver.get(url)
     soup = None
     # force browser to wait <=10 seconds for content to load
