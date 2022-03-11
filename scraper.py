@@ -1,6 +1,10 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 import validators
 import pandas as pd
 from datetime import datetime
@@ -23,15 +27,30 @@ def get_syllabus_content(url):
     options.add_argument("--log-level=3")  # disable console warnings/errors
     driver = webdriver.Chrome(options=options)
     driver.get(url)
-    html = driver.page_source
-    soup = BeautifulSoup(html, "html.parser")
-    driver.quit()
+    soup = None
+    # force browser to wait <=10 seconds for content to load
+    try:
+        elem = WebDriverWait(driver, 10).until(
+            # tr with class 'detail_list' only appears in syllabusTableBody
+            EC.presence_of_element_located(
+                (By.CLASS_NAME, "detail_list"))
+        )
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+    except TimeoutException as e:
+        print("Timed out - could not locate syllabus content.")
+    finally:
+        driver.quit()
+
     return soup
 
 
 def validate_content(soup):
     """Return True if the HTML content corresponds to a Canvas syllabus page;
     False otherwise"""
+    if not soup:
+        return False
+
     header = soup.find_all("a", {'class': 'mobile-header-title expandable'})
     if not header:
         return False
@@ -45,9 +64,6 @@ def get_course_name(soup):
 
 
 def convert_syllabus_to_df(soup):
-    if not soup:
-        return
-
     table = soup.find(id="syllabus")
 
     # strip out duplicate tasks, screenreader content, and calendar icons

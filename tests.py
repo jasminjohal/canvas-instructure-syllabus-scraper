@@ -1,6 +1,7 @@
 import unittest
 from scraper import *
 import pandas as pd
+from bs4 import BeautifulSoup
 
 
 class TestClass(unittest.TestCase):
@@ -16,6 +17,19 @@ class TestClass(unittest.TestCase):
             'https://canvas.oregonstate.edu/courses/1764380/assignments/syllabus',  # cs261
             'https://canvas.oregonstate.edu/courses/1806262/assignments/syllabus',  # cs271
             'https://canvas.oregonstate.edu/courses/1784199/assignments/syllabus'  # cs325
+        ]
+
+        self.course_names = [
+            'ANALYSIS OF ALGORITHMS (CS_325_400_F2020)',
+            'COMPUTER ARCH & ASSEM LANGUAGE (CS_271_X400_U2020)',
+            'DATA STRUCTURES (CS_261_400_S2020)',
+            'DISCRETE STRUCTURES IN CS (CS_225_401_F2019)',
+            'INTRO TO COMPUTER NETWORKS (CS_372_400_F2021)',
+            'INTRO TO COMPUTER SCIENCE I (CS_161_400_F2019)',
+            'INTRO TO COMPUTER SCIENCE II (CS_162_C400_W2020)',
+            'INTRODUCTION TO DATABASES (CS_340_400_F2020)',
+            'OPERATING SYSTEMS I (CS_344_400_W2021)',
+            'WEB DEVELOPMENT (CS_290_C400_S2020)'
         ]
 
     def test_validator(self):
@@ -41,16 +55,41 @@ class TestClass(unittest.TestCase):
             'https://canvas.northwestern.edu/courses/7060/assignments/syllabus')
         self.assertTrue(valid_url)
 
-    def test_all_osu_courses(self):
+    def test_scraper_timeout(self):
+        # get_syllabus_content should return None if the URL doesn't contain the expected Canvas syllabus content
+        syllabus = get_syllabus_content(
+            'https://github.com/jasminjohal/canvas-syllabus-scraper/tree/master/base')
+        self.assertIsNone(syllabus)
+        # validate_content should return False if passed content is not actually Canvas syllabus content
+        valid_syllabus = validate_content(syllabus)
+        self.assertFalse(valid_syllabus)
+
+    def test_scraper(self):
+        syllabus = get_syllabus_content(
+            'https://canvas.oregonstate.edu/courses/1792599/assignments/syllabus')
+        if syllabus:
+            syllabus_container = syllabus.find(
+                'div', {'id': 'syllabusContainer'})
+            self.assertIsNotNone(syllabus_container)
+
+    def test_course_name(self):
+        # get_course_name should return the correct course name
+        with open('testing/html/OPERATING SYSTEMS I (CS_344_400_W2021).html', encoding="utf8") as fp:
+            syllabus = BeautifulSoup(fp, 'html.parser')
+        course_name = get_course_name(syllabus)
+        self.assertEqual(
+            course_name, 'OPERATING SYSTEMS I (CS_344_400_W2021)')
+
+    def test_converter_for_all_osu_courses(self):
         # verify that the scraped df for each course matches the expected format
         for course_url in self.course_urls:
             syllabus = get_syllabus_content(course_url)
             course_name = get_course_name(syllabus)
+            print(f"Testing {course_name}...")
             df = convert_syllabus_to_df(syllabus)
             # keep_default_na interprets empty cells as empty strings
             expected_df = pd.read_csv(
-                f'./df/{course_name}_df.csv', keep_default_na=False)
-            print(f"Testing {course_name}...")
+                f'./testing/df/{course_name}_df.csv', keep_default_na=False)
 
             # output df differences (verbose)
             # result = df.compare(expected_df, align_axis=0,
@@ -64,4 +103,5 @@ class TestClass(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main(verbosity=2)
+    # unittest.main(verbosity=2)
+    unittest.main()
