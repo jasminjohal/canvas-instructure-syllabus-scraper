@@ -1,35 +1,25 @@
-## TODO
+![landing page](./static/img/app-landing-page.png)
 
-- [x] Add styling (Bootstrap?)
-  - [x] Remove Bootstrap and self-style form page
-- [x] Add 'About' page
-- [x] Add processing for Asana
-  - [ ] Allow user to enter assignee (update cache) #asana-assignee branch
-- [ ] Refactor code
-- [x] Add loading spinner
-- [ ] Error management
-  - [x] Check if URL is valid
-  - [x] Force browser to wait until table loads (HIGH PRIORITY)
-    ```html
-    <tr>
-      <td scope="row">
-        <img src="/images/ajax-reload-animated.gif" />
-      </td>
-    </tr>
-    ```
-- [x] Create expect outputs for all available OSU CS syllabus pages
-  - [x] CS325 (OK)
-  - [x] CS271 (OK)
-  - [x] CS261 (OK)
-  - [x] CS225 (OK)
-  - [x] CS372 (OK)
-  - [x] CS162 (OK)
-  - [x] CS340 (OK)
-  - [x] CS344 (OK)
-  - [x] CS361 (OK)
-  - [x] CS290 (OK)
-- [x] Fix bug(s) that causes discrepant outputs in above courses
+## About
+
+Canvas Syllabus Scraper is a web app that was designed so that students don't have to manually enter in tasks from [Canvas](https://www.instructure.com/canvas) into their task management systems at the beginning of every quarter/semester. Upon entering the URL for a course's syllabus page on Canvas, the app will scrape the syllabus content and output a CSV that can be imported into your task management system\*. The CSV contains the task name and due date for every task on the syllabus.
+
+_\*Currently, only Todoist and Asana are supported._
+
+## Demo
+
+The application is hosted on Heroku. Click [here](https://canvas-syllabus-scraper.herokuapp.com/) to access the live demo.
+
+## Todo
+
+- [ ] Double check Asana import
 - [ ] Test against non-OSU courses
-  - [ ] Address instances where date range is given in 'Due' column (e.g. "6:15pm to 9:15pm" in https://canvas.northwestern.edu/courses/7060/assignments/syllabus)
+- [ ] Address instances where date range is given in 'Due' column (e.g. "6:15pm to 9:15pm" in https://canvas.northwestern.edu/courses/7060/assignments/syllabus)
+- [ ] Allow user to enter assignee #asana-assignee branch
+- [ ] Refactor code
+- [ ] Implement caching system
 - [ ] Display tasks to user prior to download
-- [x] Deploy to Heroku
+- [ ] Add support for other todo apps
+  - [ ] Microsoft To Do
+  - [ ] TickTick
+  - [ ] Things 3
