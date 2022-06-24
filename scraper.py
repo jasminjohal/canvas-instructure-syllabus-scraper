@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from setuptools import setup
 import validators
 import pandas as pd
 from datetime import datetime
@@ -24,24 +25,33 @@ def check_if_url_is_valid(url):
     return valid_url and valid_canvas_url
 
 
-def get_syllabus_content(url):
+def setup_driver():
     options = webdriver.ChromeOptions()
     options.binary_location = os.environ.get("GOOGLE_CHROME_BIN", None)
     options.add_argument("--headless")
-    options.add_argument("--log-level=3")  # disable console warnings/errors
+    # disable console warnings/errors
+    options.add_argument("--log-level=3")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(executable_path=os.environ.get(
         "CHROMEDRIVER_PATH"), options=options)
-    driver.get(url)
+    return driver
+
+
+def get_raw_html(url):
+    """Return the raw scraped contents of the passed URL"""
+
+    # visit url
     soup = None
-    # force browser to wait <=10 seconds for content to load
+    driver = setup_driver()
+    driver.get(url)
+
     try:
+        # force browser to wait <=10 seconds for content to load
         elem = WebDriverWait(driver, 10).until(
             # tr with class 'detail_list' only appears in syllabusTableBody
-            EC.presence_of_element_located(
-                (By.CLASS_NAME, "detail_list"))
+            EC.presence_of_element_located((By.CLASS_NAME, "detail_list"))
         )
         html = driver.page_source
         soup = BeautifulSoup(html, "html.parser")
@@ -66,60 +76,99 @@ def validate_content(soup):
 
 
 def get_course_name(soup):
+    """Extract and return the full name of the course from the scraped HTML page"""
     header = soup.find_all("a", {'class': 'mobile-header-title expandable'})[0]
     course_name = header.find('div').text
     return course_name
 
 
-def convert_syllabus_to_df(soup):
-    table = soup.find(id="syllabus")
-
-    # strip out duplicate tasks, screenreader content, and calendar icons
+def remove_extraneous_rows(table):
+    """Remove all rows in HTML table that contain duplicate tasks, screenreader content, and calendar icons"""
+    # removes duplicate (1 student), (3 students) rows
     for tr in table.find_all("tr", {'class': 'special_date'}):
-        # removes duplicate (1 student), (3 students) rows
         tr.decompose()
     for span in table.find_all("span", {'class': 'screenreader-only'}):
         span.decompose()
     for icon in table.find_all("i", {'class': 'icon-assignment'}):
         icon.decompose()
 
+
+def create_df(tasks, dates, times):
+    """Return a dataframe with Tasks, Dates, and Times columns"""
+    return pd.DataFrame({
+        'Tasks': tasks,
+        'Dates': dates,
+        'Times': times
+    })
+
+
+def contains_date(row):
+    """Return True if the row has a populated date field; return False otherwise"""
+    # date is contained in a class name (e.g. "events_2020_09_27")
+    for row_class in row['class']:
+        if "events_" in row_class:
+            return True
+
+    return False
+
+
+def extract_date(row):
+    """Parse and return the date from the passed row data if it has a date"""
+    # check if the task has a due date; some tasks do not
+    if contains_date(row):
+        # date is contained in a class name (e.g. "events_2020_09_27")
+        task_date = row['class'][3].split('_')
+        year = task_date[1]
+        month = task_date[2]
+        day = task_date[3]
+        task_date = f'{month}/{day}/{year}'
+        # "09/27/2020" -> "Sun Sep 27, 2020"
+        task_date = datetime.strptime(
+            task_date, '%m/%d/%Y').strftime('%a %b %#d, %Y')  # THIS IS ONLY VALID FOR WINDOWS!
+    else:
+        task_date = ''
+
+    return task_date
+
+
+def extract_task_name(row):
+    """Parse and return the task name from the passed row data"""
+    return row.find_all('td', {'class': 'name'})[
+        0].text.strip().replace('\n', '')
+
+
+def extract_time(row):
+    """Parse and return the time from the passed row data"""
+    return row.find_all('td', {'class': 'dates'})[
+        0].text.strip().replace('\n', '')
+
+
+def get_syllabus_rows(soup):
+    """Accepts the raw HTML content of the syllabus page and returns a list of rows in the syllabus table"""
+    table = soup.find(id="syllabus")
+    remove_extraneous_rows(table)
+    rows = table.find_all('tr')
+    return rows
+
+
+def convert_syllabus_to_df(syllabus):
+    """Return a pandas dataframe after parsing every row in the syllabus HTML"""
     dates = []
     tasks = []
     times = []
 
-    rows = table.find_all('tr')
-    for row in rows[1:]:  # first row contains column names
-        # date is contained in class name (e.g. "events_2021_12_03")
-        classes = row['class']
-        found_date = False
-        for row_class in classes:
-            if "events_" in row_class:
-                found_date = True
-
-        if found_date:
-            task_date = classes[3].split('_')
-            year = task_date[1]
-            month = task_date[2]
-            day = task_date[3]
-            task_date = f'{month}/{day}/{year}'
-            # "09/27/2020" -> "Sun Sep 27, 2020"
-            task_date = datetime.strptime(
-                task_date, '%m/%d/%Y').strftime('%a %b %#d, %Y')  # THIS IS ONLY VALID FOR WINDOWS!
-        # some tasks do not have due dates
-        else:
-            task_date = ''
-
-        task_name = row.find_all('td', {'class': 'name'})[
-            0].text.strip().replace('\n', '')
-        task_time = row.find_all('td', {'class': 'dates'})[
-            0].text.strip().replace('\n', '')
+    # get the task date, name, and time information from each row in syllabus
+    # but ignore first row because it contains column names
+    for row in syllabus[1:]:
+        task_date = extract_date(row)
+        task_name = extract_task_name(row)
+        task_time = extract_time(row)
 
         dates.append(task_date)
         tasks.append(task_name)
         times.append(task_time)
 
-    syllabus_df = pd.DataFrame(
-        {'Tasks': tasks, 'Dates': dates, 'Times': times})
+    syllabus_df = create_df(tasks, dates, times)
     return syllabus_df
 
 
@@ -171,8 +220,9 @@ def process_df_for_asana(df):
 if __name__ == "__main__":
     CS361_URL = 'https://oregonstate.instructure.com/courses/1877222/assignments/syllabus'
     CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'
-    html = get_syllabus_content(CS361_URL)
+    html = get_raw_html(CS361_URL)
     course_name = get_course_name(html)
-    df = convert_syllabus_to_df(html)
+    syllabus = get_syllabus_rows(html)
+    df = convert_syllabus_to_df(syllabus)
     todoist_df = process_df_for_todoist(df)
     print(todoist_df)

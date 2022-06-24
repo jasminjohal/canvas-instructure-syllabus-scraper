@@ -26,11 +26,12 @@ def todoist():
         valid_url = check_if_url_is_valid(course_url)
         if not valid_url:
             return render_template('form.html', invalid_url=True)
-        syllabus = get_syllabus_content(course_url)
-        valid_syllabus = validate_content(syllabus)
+        html = get_raw_html(course_url)
+        valid_syllabus = validate_content(html)
         if not valid_syllabus:
             return render_template('form.html', error=True)
-        course_name = get_course_name(syllabus)
+        course_name = get_course_name(html)
+        syllabus = get_syllabus_rows(html)
         df = convert_syllabus_to_df(syllabus)
 
         if tms == 'Todoist':
