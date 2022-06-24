@@ -2,9 +2,9 @@
 
 ## About
 
-Canvas Syllabus Scraper is a web app that was designed so that students don't have to manually enter in tasks from [Canvas](https://www.instructure.com/canvas) into their task management systems at the beginning of every quarter/semester. Upon entering the URL for a course's syllabus page on Canvas, the app will scrape the syllabus content and output a CSV that can be imported into your task management system\*. The CSV contains the task name and due date for every task on the syllabus.
+Canvas Syllabus Scraper is a web app that was designed so that students don't have to manually enter in tasks from [Canvas](https://www.instructure.com/canvas) into their task management systems at the beginning of every quarter/semester. Upon entering the URL for a course's syllabus page on Canvas, the app will scrape the syllabus content and output a CSV that can be imported into your personal task management system[^1]. The CSV contains the task name and due date for every task on the syllabus.
 
-_\*Currently, only Todoist and Asana are supported._
+[^1]Currently, only Todoist and Asana are supported.
 
 ## Demo
 

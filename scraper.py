@@ -124,9 +124,6 @@ def convert_syllabus_to_df(soup):
 
 
 def process_df_for_todoist(df):
-    # remove non-ASCII characters
-    # df.replace({r'[^\x00-\x7F]+': ' '}, regex=True, inplace=True)
-
     df = df.rename(columns={"Dates": "DATE", "Tasks": "CONTENT"})
 
     # requisite columns for Todoist import
@@ -150,10 +147,6 @@ def process_df_for_todoist(df):
 
 
 def process_df_for_asana(df):
-    # remove non-ASCII characters
-    # df.replace({r'[^\x00-\x7F]+': ' '}, regex=True, inplace=True)
-
-    # rename column names
     # place time in description since Asana does not support due time
     df = df.rename(columns={"Dates": "Due Date",
                             "Tasks": "Name", "Times": "Description"})
