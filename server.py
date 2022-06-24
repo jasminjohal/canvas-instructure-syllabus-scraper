@@ -17,7 +17,7 @@ def scrape():
             return render_template('form.html', invalid_url=True)
 
         driver = setup_driver()
-        html = get_raw_html(driver, course_url)
+        html = get_soupified_html(driver, course_url)
         if not is_canvas_page(html):
             return render_template('form.html', error=True)
 

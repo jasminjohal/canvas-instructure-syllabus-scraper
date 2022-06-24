@@ -42,11 +42,10 @@ def setup_driver():
     return driver
 
 
-def get_raw_html(driver, url):
-    """Return the raw scraped contents of the passed URL"""
-
+def get_soupified_html(driver, url):
+    """Return a BeautifulSoup object representing the HTML contents of the passed URL"""
     # visit url
-    soup = None
+    html_soup = None
     driver.get(url)
 
     try:
@@ -55,42 +54,36 @@ def get_raw_html(driver, url):
             # tr with class 'detail_list' only appears in syllabusTableBody
             EC.presence_of_element_located((By.CLASS_NAME, "detail_list"))
         )
-        html = driver.page_source
-        soup = BeautifulSoup(html, "html.parser")
+        html_soup = BeautifulSoup(driver.page_source, "html.parser")
     except TimeoutException as e:
         print("Timed out - could not locate syllabus content.")
     finally:
         driver.quit()
 
-    return soup
+    return html_soup
 
 
-def is_canvas_page(soup):
+def is_canvas_page(html_soup):
     """Return True if the HTML content corresponds to a Canvas syllabus page;
     False otherwise"""
-    if not soup:
+    # there is no html
+    if not html_soup:
         return False
 
     # check if the page has a header contained specifically in Canvas course pages
-    header = soup.find_all("a", {'class': 'mobile-header-title expandable'})
+    header = html_soup.find_all(
+        "a", {'class': 'mobile-header-title expandable'})
     if not header:
         return False
     return True
 
 
-def get_course_name(soup):
+def get_course_name(html_soup):
     """Extract and return the full name of the course from the scraped HTML page"""
-    header = soup.find_all("a", {'class': 'mobile-header-title expandable'})[0]
+    header = html_soup.find_all(
+        "a", {'class': 'mobile-header-title expandable'})[0]
     course_name = header.find('div').text
     return course_name
-
-
-def get_syllabus_rows(soup):
-    """Accepts the raw HTML content of the syllabus page and returns a list of rows in the syllabus table"""
-    table = soup.find(id="syllabus")
-    remove_extraneous_rows(table)
-    rows = table.find_all('tr')
-    return rows
 
 
 def remove_extraneous_rows(table):
@@ -102,6 +95,14 @@ def remove_extraneous_rows(table):
         span.decompose()
     for icon in table.find_all("i", {'class': 'icon-assignment'}):
         icon.decompose()
+
+
+def get_syllabus_rows(html_soup):
+    """Accepts the raw HTML content of the syllabus page and returns a list of rows in the syllabus table"""
+    table = html_soup.find(id="syllabus")
+    remove_extraneous_rows(table)
+    rows = table.find_all('tr')
+    return rows
 
 
 def contains_date(row):
@@ -176,7 +177,7 @@ def convert_syllabus_to_df(syllabus):
 
 
 def rename_columns(df, tms):
-    """Return a dataframe with renamed column names depending on the passed task management system"""
+    """Return a new dataframe with renamed column names depending on the passed task management system"""
     if tms == 'todoist':
         df = df.rename(columns={"Dates": "DATE", "Tasks": "CONTENT"})
     elif tms == 'asana':
@@ -187,7 +188,7 @@ def rename_columns(df, tms):
 
 
 def add_columns(df, tms):
-    """Add requisite columns to passed dataframe depending on task management system"""
+    """Modify passed dataframe in place by adding requisite columns depending on task management system"""
     if tms == 'todoist':
         df['TYPE'] = "task"
         df['PRIORITY'] = 4
@@ -205,6 +206,7 @@ def add_columns(df, tms):
 
 
 def format_date_column(df, tms):
+    """Modify passed dataframe in place by formatting the date column depending on the passed task management system"""
     if tms == 'todoist':
         # concatenate the time to the date for 'DATE' column
         df['Times'] = df['Times'].str.replace(
@@ -216,7 +218,7 @@ def format_date_column(df, tms):
 
 
 def reorder_columns(df, tms):
-    """Return a dataframe with reordered columns depending on the passed task management system"""
+    """Return a new dataframe with reordered columns depending on the passed task management system"""
     if tms == 'todoist':
         df = df[['TYPE', 'CONTENT', 'PRIORITY', 'INDENT', 'AUTHOR',
                  'RESPONSIBLE', 'DATE', 'DATE_LANG', 'TIMEZONE']]
@@ -227,7 +229,7 @@ def reorder_columns(df, tms):
 
 
 def process_df_for_tms(df, tms):
-    """Return modified version of df in accordance with task management system specifications"""
+    """Return a new df that abides by the passed task management system's specifications"""
     df = rename_columns(df, tms)
     add_columns(df, tms)
     format_date_column(df, tms)
@@ -240,7 +242,7 @@ if __name__ == "__main__":
     CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'
 
     driver = setup_driver()
-    html = get_raw_html(driver, CS361_URL)
+    html = get_soupified_html(driver, CS361_URL)
     course_name = get_course_name(html)
     syllabus = get_syllabus_rows(html)
     df = convert_syllabus_to_df(syllabus)
