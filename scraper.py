@@ -1,3 +1,4 @@
+from ast import Return
 import os
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -14,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def check_if_url_is_valid(url):
+def is_valid_url(url):
     """Accept a URL and returns True if the URL is a valid Canvas syllabus URL;
     False otherwise."""
     valid_url = valid_canvas_url = True
@@ -26,6 +27,7 @@ def check_if_url_is_valid(url):
 
 
 def setup_driver():
+    """Return an instance of ChromeDriver"""
     options = webdriver.ChromeOptions()
     options.binary_location = os.environ.get("GOOGLE_CHROME_BIN", None)
     options.add_argument("--headless")
@@ -36,15 +38,15 @@ def setup_driver():
     options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(executable_path=os.environ.get(
         "CHROMEDRIVER_PATH"), options=options)
+
     return driver
 
 
-def get_raw_html(url):
+def get_raw_html(driver, url):
     """Return the raw scraped contents of the passed URL"""
 
     # visit url
     soup = None
-    driver = setup_driver()
     driver.get(url)
 
     try:
@@ -63,12 +65,13 @@ def get_raw_html(url):
     return soup
 
 
-def validate_content(soup):
+def is_canvas_page(soup):
     """Return True if the HTML content corresponds to a Canvas syllabus page;
     False otherwise"""
     if not soup:
         return False
 
+    # check if the page has a header contained specifically in Canvas course pages
     header = soup.find_all("a", {'class': 'mobile-header-title expandable'})
     if not header:
         return False
@@ -82,6 +85,14 @@ def get_course_name(soup):
     return course_name
 
 
+def get_syllabus_rows(soup):
+    """Accepts the raw HTML content of the syllabus page and returns a list of rows in the syllabus table"""
+    table = soup.find(id="syllabus")
+    remove_extraneous_rows(table)
+    rows = table.find_all('tr')
+    return rows
+
+
 def remove_extraneous_rows(table):
     """Remove all rows in HTML table that contain duplicate tasks, screenreader content, and calendar icons"""
     # removes duplicate (1 student), (3 students) rows
@@ -91,15 +102,6 @@ def remove_extraneous_rows(table):
         span.decompose()
     for icon in table.find_all("i", {'class': 'icon-assignment'}):
         icon.decompose()
-
-
-def create_df(tasks, dates, times):
-    """Return a dataframe with Tasks, Dates, and Times columns"""
-    return pd.DataFrame({
-        'Tasks': tasks,
-        'Dates': dates,
-        'Times': times
-    })
 
 
 def contains_date(row):
@@ -143,12 +145,13 @@ def extract_time(row):
         0].text.strip().replace('\n', '')
 
 
-def get_syllabus_rows(soup):
-    """Accepts the raw HTML content of the syllabus page and returns a list of rows in the syllabus table"""
-    table = soup.find(id="syllabus")
-    remove_extraneous_rows(table)
-    rows = table.find_all('tr')
-    return rows
+def create_df(tasks, dates, times):
+    """Return a dataframe with Tasks, Dates, and Times columns"""
+    return pd.DataFrame({
+        'Tasks': tasks,
+        'Dates': dates,
+        'Times': times
+    })
 
 
 def convert_syllabus_to_df(syllabus):
@@ -172,57 +175,74 @@ def convert_syllabus_to_df(syllabus):
     return syllabus_df
 
 
-def process_df_for_todoist(df):
-    df = df.rename(columns={"Dates": "DATE", "Tasks": "CONTENT"})
-
-    # requisite columns for Todoist import
-    df['TYPE'] = "task"
-    df['PRIORITY'] = 4
-    df['INDENT'] = ""
-    df['AUTHOR'] = ""
-    df['RESPONSIBLE'] = ""
-    df['DATE_LANG'] = "en"
-    df['TIMEZONE'] = ""
-
-    # get time from 'Due' column and concatenate to 'DATE'
-    df['Times'] = df['Times'].str.replace(
-        'due by ', '', regex=True).str.strip()
-    df['DATE'] = df['DATE'] + " @ " + df['Times']
-
-    # reorder columns and output to csv
-    df = df[['TYPE', 'CONTENT', 'PRIORITY', 'INDENT', 'AUTHOR',
-             'RESPONSIBLE', 'DATE', 'DATE_LANG', 'TIMEZONE']]
+def rename_columns(df, tms):
+    """Return a dataframe with renamed column names depending on the passed task management system"""
+    if tms == 'todoist':
+        df = df.rename(columns={"Dates": "DATE", "Tasks": "CONTENT"})
+    elif tms == 'asana':
+        # place time in description since Asana does not support due time
+        df = df.rename(columns={"Dates": "Due Date",
+                       "Tasks": "Name", "Times": "Description"})
     return df
 
 
-def process_df_for_asana(df):
-    # place time in description since Asana does not support due time
-    df = df.rename(columns={"Dates": "Due Date",
-                            "Tasks": "Name", "Times": "Description"})
+def add_columns(df, tms):
+    """Add requisite columns to passed dataframe depending on task management system"""
+    if tms == 'todoist':
+        df['TYPE'] = "task"
+        df['PRIORITY'] = 4
+        df['INDENT'] = ""
+        df['AUTHOR'] = ""
+        df['RESPONSIBLE'] = ""
+        df['DATE_LANG'] = "en"
+        df['TIMEZONE'] = ""
+    elif tms == 'asana':
+        df['Assignee'] = ""
+        df['Collaborators'] = ""
+        df['Start Date'] = ""
+        df['Type'] = ""
+        df['Section/Column'] = ""
 
-    # requisite columns for Asana import
-    df['Assignee'] = ""
-    df['Collaborators'] = ""
-    df['Start Date'] = ""
-    df['Type'] = ""
-    df['Section/Column'] = ""
 
-    # convert date to format that Asana expects (e.g. 'Mon Sep 27, 2021' -> '9/27/21')
-    df['Due Date'] = pd.to_datetime(df['Due Date'], format='%a %b %d, %Y')
+def format_date_column(df, tms):
+    if tms == 'todoist':
+        # concatenate the time to the date for 'DATE' column
+        df['Times'] = df['Times'].str.replace(
+            'due by ', '', regex=True).str.strip()
+        df['DATE'] = df['DATE'] + " @ " + df['Times']
+    elif tms == 'asana':
+        # convert date to format that Asana expects (e.g. 'Mon Sep 27, 2021' -> '9/27/21')
+        df['Due Date'] = pd.to_datetime(df['Due Date'], format='%a %b %d, %Y')
 
-    # reorder columns and output to csv
-    df = df[['Name', 'Description', 'Assignee', 'Collaborators',
-             'Due Date', 'Start Date', 'Type', 'Section/Column']]
 
+def reorder_columns(df, tms):
+    """Return a dataframe with reordered columns depending on the passed task management system"""
+    if tms == 'todoist':
+        df = df[['TYPE', 'CONTENT', 'PRIORITY', 'INDENT', 'AUTHOR',
+                 'RESPONSIBLE', 'DATE', 'DATE_LANG', 'TIMEZONE']]
+    elif tms == 'asana':
+        df = df[['Name', 'Description', 'Assignee', 'Collaborators',
+                 'Due Date', 'Start Date', 'Type', 'Section/Column']]
+    return df
+
+
+def process_df_for_tms(df, tms):
+    """Return modified version of df in accordance with task management system specifications"""
+    df = rename_columns(df, tms)
+    add_columns(df, tms)
+    format_date_column(df, tms)
+    df = reorder_columns(df, tms)
     return df
 
 
 if __name__ == "__main__":
     CS361_URL = 'https://oregonstate.instructure.com/courses/1877222/assignments/syllabus'
     CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'
-    html = get_raw_html(CS361_URL)
+
+    driver = setup_driver()
+    html = get_raw_html(driver, CS361_URL)
     course_name = get_course_name(html)
     syllabus = get_syllabus_rows(html)
     df = convert_syllabus_to_df(syllabus)
-    todoist_df = process_df_for_todoist(df)
+    todoist_df = process_df_for_tms(df, 'todoist')
     print(todoist_df)
