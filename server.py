@@ -39,7 +39,7 @@ def download():
 
     df_for_download = pd.read_json(df)
     return Response(
-        df_for_download.to_csv(),
+        df_for_download.to_csv(index=False),
         mimetype='text/csv',
         headers={'Content-disposition':
                  'attachment; filename=syllabus_tasks.csv'})
