@@ -42,10 +42,11 @@ def setup_driver():
     return driver
 
 
-def get_soupified_html(driver, url):
+def get_soupified_html(url):
     """Return a BeautifulSoup object representing the HTML contents of the passed URL"""
     # visit url
     html_soup = None
+    driver = setup_driver()
     driver.get(url)
 
     try:
@@ -116,7 +117,7 @@ def contains_date(row):
 
 
 def extract_date(row):
-    """Parse and return the date from the passed row data if it has a date"""
+    """Parse and return the date as string from the passed row data if it has a date"""
     # check if the task has a due date; some tasks do not
     if contains_date(row):
         # date is contained in a class name (e.g. "events_2020_09_27")
@@ -213,8 +214,9 @@ def format_date_column(df, tms):
             'due by ', '', regex=True).str.strip()
         df['DATE'] = df['DATE'] + " @ " + df['Times']
     elif tms == 'asana':
-        # convert date to format that Asana expects (e.g. 'Mon Sep 27, 2021' -> '9/27/21')
+        # convert date to format that Asana expects (e.g. 'Mon Sep 27, 2021' -> '09/27/2021')
         df['Due Date'] = pd.to_datetime(df['Due Date'], format='%a %b %d, %Y')
+        df['Due Date'] = df['Due Date'].dt.strftime('%m/%d/%Y')
 
 
 def reorder_columns(df, tms):
@@ -241,8 +243,7 @@ if __name__ == "__main__":
     CS361_URL = 'https://oregonstate.instructure.com/courses/1877222/assignments/syllabus'
     CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'
 
-    driver = setup_driver()
-    html = get_soupified_html(driver, CS361_URL)
+    html = get_soupified_html(CS361_URL)
     course_name = get_course_name(html)
     syllabus = get_syllabus_rows(html)
     df = convert_syllabus_to_df(syllabus)
