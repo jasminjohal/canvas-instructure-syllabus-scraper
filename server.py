@@ -4,10 +4,10 @@ from scraper import *
 
 app = Flask(__name__)
 load_dotenv()
-app.secret_key = os.environ.get("SECRET_KEY")
+app.secret_key = os.environ.get('SECRET_KEY')
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def scrape():
     if request.method == 'POST':
         course_url = request.form['course_url']
@@ -31,7 +31,7 @@ def scrape():
         return render_template('form.html')
 
 
-@app.route("/download")
+@app.route('/download')
 def download():
     df = session.get('df')
     if not df:
@@ -40,15 +40,15 @@ def download():
     df_for_download = pd.read_json(df)
     return Response(
         df_for_download.to_csv(),
-        mimetype="text/csv",
-        headers={"Content-disposition":
-                 "attachment; filename=syllabus_tasks.csv"})
+        mimetype='text/csv',
+        headers={'Content-disposition':
+                 'attachment; filename=syllabus_tasks.csv'})
 
 
-@app.route("/about")
+@app.route('/about')
 def about():
     return render_template('about.html')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run()

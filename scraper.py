@@ -21,7 +21,7 @@ def is_valid_url(url):
     valid_url = valid_canvas_url = True
     if not validators.url(url):
         valid_url = False
-    if ("instructure" not in url or "canvas" not in url) and "syllabus" not in url:
+    if ('instructure' not in url or 'canvas' not in url) and 'syllabus' not in url:
         valid_canvas_url = False
     return valid_url and valid_canvas_url
 
@@ -29,15 +29,15 @@ def is_valid_url(url):
 def setup_driver():
     """Return an instance of ChromeDriver"""
     options = webdriver.ChromeOptions()
-    options.binary_location = os.environ.get("GOOGLE_CHROME_BIN", None)
-    options.add_argument("--headless")
+    options.binary_location = os.environ.get('GOOGLE_CHROME_BIN', None)
+    options.add_argument('--headless')
     # disable console warnings/errors
-    options.add_argument("--log-level=3")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
+    options.add_argument('--log-level=3')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--no-sandbox')
     driver = webdriver.Chrome(executable_path=os.environ.get(
-        "CHROMEDRIVER_PATH"), options=options)
+        'CHROMEDRIVER_PATH'), options=options)
 
     return driver
 
@@ -53,11 +53,11 @@ def get_soupified_html(url):
         # force browser to wait <=10 seconds for content to load
         elem = WebDriverWait(driver, 10).until(
             # tr with class 'detail_list' only appears in syllabusTableBody
-            EC.presence_of_element_located((By.CLASS_NAME, "detail_list"))
+            EC.presence_of_element_located((By.CLASS_NAME, 'detail_list'))
         )
-        html_soup = BeautifulSoup(driver.page_source, "html.parser")
+        html_soup = BeautifulSoup(driver.page_source, 'html.parser')
     except TimeoutException as e:
-        print("Timed out - could not locate syllabus content.")
+        print('Timed out - could not locate syllabus content.')
     finally:
         driver.quit()
 
@@ -73,7 +73,7 @@ def is_canvas_page(html_soup):
 
     # check if the page has a header contained specifically in Canvas course pages
     header = html_soup.find_all(
-        "a", {'class': 'mobile-header-title expandable'})
+        'a', {'class': 'mobile-header-title expandable'})
     if not header:
         return False
     return True
@@ -82,7 +82,7 @@ def is_canvas_page(html_soup):
 def get_course_name(html_soup):
     """Extract and return the full name of the course from the scraped HTML page"""
     header = html_soup.find_all(
-        "a", {'class': 'mobile-header-title expandable'})[0]
+        'a', {'class': 'mobile-header-title expandable'})[0]
     course_name = header.find('div').text
     return course_name
 
@@ -90,17 +90,17 @@ def get_course_name(html_soup):
 def remove_extraneous_rows(table):
     """Remove all rows in HTML table that contain duplicate tasks, screenreader content, and calendar icons"""
     # removes duplicate (1 student), (3 students) rows
-    for tr in table.find_all("tr", {'class': 'special_date'}):
+    for tr in table.find_all('tr', {'class': 'special_date'}):
         tr.decompose()
-    for span in table.find_all("span", {'class': 'screenreader-only'}):
+    for span in table.find_all('span', {'class': 'screenreader-only'}):
         span.decompose()
-    for icon in table.find_all("i", {'class': 'icon-assignment'}):
+    for icon in table.find_all('i', {'class': 'icon-assignment'}):
         icon.decompose()
 
 
 def get_syllabus_rows(html_soup):
     """Accepts the raw HTML content of the syllabus page and returns a list of rows in the syllabus table"""
-    table = html_soup.find(id="syllabus")
+    table = html_soup.find(id='syllabus')
     remove_extraneous_rows(table)
     rows = table.find_all('tr')
     return rows
@@ -110,7 +110,7 @@ def contains_date(row):
     """Return True if the row has a populated date field; return False otherwise"""
     # date is contained in a class name (e.g. "events_2020_09_27")
     for row_class in row['class']:
-        if "events_" in row_class:
+        if 'events_' in row_class:
             return True
 
     return False
@@ -180,30 +180,30 @@ def convert_syllabus_to_df(syllabus):
 def rename_columns(df, tms):
     """Return a new dataframe with renamed column names depending on the passed task management system"""
     if tms == 'todoist':
-        df = df.rename(columns={"Dates": "DATE", "Tasks": "CONTENT"})
+        df = df.rename(columns={'Dates': 'DATE', 'Tasks': 'CONTENT'})
     elif tms == 'asana':
         # place time in description since Asana does not support due time
-        df = df.rename(columns={"Dates": "Due Date",
-                       "Tasks": "Name", "Times": "Description"})
+        df = df.rename(columns={'Dates': 'Due Date',
+                       'Tasks': 'Name', 'Times': 'Description'})
     return df
 
 
 def add_columns(df, tms):
     """Modify passed dataframe in place by adding requisite columns depending on task management system"""
     if tms == 'todoist':
-        df['TYPE'] = "task"
+        df['TYPE'] = 'task'
         df['PRIORITY'] = 4
-        df['INDENT'] = ""
-        df['AUTHOR'] = ""
-        df['RESPONSIBLE'] = ""
-        df['DATE_LANG'] = "en"
-        df['TIMEZONE'] = ""
+        df['INDENT'] = ''
+        df['AUTHOR'] = ''
+        df['RESPONSIBLE'] = ''
+        df['DATE_LANG'] = 'en'
+        df['TIMEZONE'] = ''
     elif tms == 'asana':
-        df['Assignee'] = ""
-        df['Collaborators'] = ""
-        df['Start Date'] = ""
-        df['Type'] = ""
-        df['Section/Column'] = ""
+        df['Assignee'] = ''
+        df['Collaborators'] = ''
+        df['Start Date'] = ''
+        df['Type'] = ''
+        df['Section/Column'] = ''
 
 
 def format_date_column(df, tms):

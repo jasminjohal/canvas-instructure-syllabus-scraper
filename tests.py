@@ -159,14 +159,14 @@ class TestClass(unittest.TestCase):
     def test_format_date_column_todoist(self):
         # format_date_column should appropriately modify the date column depending on task management system
         df = TestClass.df.copy()
-        df = df.rename(columns={"Dates": "DATE"})
+        df = df.rename(columns={'Dates': 'DATE'})
         format_date_column(df, 'todoist')
         self.assertEqual(df['DATE'].iat[0], 'Fri Dec 3, 2021 @ 11:59pm')
 
     def test_format_date_column_asana(self):
         # format_date_column should appropriately modify the date column depending on task management system
         df = TestClass.df.copy()
-        df = df.rename(columns={"Dates": "Due Date"})
+        df = df.rename(columns={'Dates': 'Due Date'})
         format_date_column(df, 'asana')
         self.assertEqual(df['Due Date'].iat[0], '12/03/2021')
 
