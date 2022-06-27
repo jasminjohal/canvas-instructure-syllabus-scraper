@@ -13,15 +13,3 @@ Please refer to this video for a detailed walkthrough of the scrape, download, a
 ## Demo
 
 The application is hosted on Heroku. Click [here](https://canvas-syllabus-scraper.herokuapp.com/) to access the live demo.
-
-## Todo
-
-- [ ] Test against non-OSU courses
-- [ ] Address instances where date range is given in 'Due' column (e.g. "6:15pm to 9:15pm" in https://canvas.northwestern.edu/courses/7060/assignments/syllabus)
-- [ ] Allow user to enter assignee #asana-assignee branch
-- [ ] Implement caching system
-- [ ] Display tasks to user prior to download
-- [ ] Add support for other todo apps
-  - [ ] Microsoft To Do
-  - [ ] TickTick
-  - [ ] Things 3
