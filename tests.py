@@ -140,7 +140,9 @@ class TestClass(unittest.TestCase):
         df = TestClass.df.copy()
         df = df.rename(columns={'Dates': 'DATE'})
         format_date_column(df, 'todoist')
-        self.assertEqual(df['DATE'].iat[0], 'Fri Dec 3, 2021 @ 11:59pm')
+        # allow for os date format discrepancies (Todoist will be fine with either format)
+        self.assertTrue(
+            df['DATE'].iat[0] == 'Fri Dec 3, 2021 @ 11:59pm' or df['DATE'].iat[0] == 'Fri Dec 03, 2021 @ 11:59pm')
 
     def test_format_date_column_asana(self):
         # format_date_column should appropriately modify the date column depending on task management system
