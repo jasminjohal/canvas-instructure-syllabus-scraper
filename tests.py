@@ -9,19 +9,6 @@ load_dotenv()
 class TestClass(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.course_urls = [
-            'https://canvas.oregonstate.edu/courses/1792599/assignments/syllabus',  # cs290
-            'https://canvas.oregonstate.edu/courses/1798831/assignments/syllabus',  # cs344
-            'https://canvas.oregonstate.edu/courses/1784208/assignments/syllabus',  # cs340
-            'https://canvas.oregonstate.edu/courses/1780220/assignments/syllabus',  # cs162
-            'https://canvas.oregonstate.edu/courses/1738821/assignments/syllabus',  # cs161
-            'https://canvas.oregonstate.edu/courses/1830291/assignments/syllabus',  # cs372
-            'https://canvas.oregonstate.edu/courses/1772429/assignments/syllabus',  # cs225
-            'https://canvas.oregonstate.edu/courses/1764380/assignments/syllabus',  # cs261
-            'https://canvas.oregonstate.edu/courses/1806262/assignments/syllabus',  # cs271
-            'https://canvas.oregonstate.edu/courses/1784199/assignments/syllabus'  # cs325
-        ]
-
         # create a BeautifulSoup object that contains a single tr element of a syllabus
         with open('testing/html/row_with_date.html', encoding="utf8") as fp:
             soup = BeautifulSoup(fp, 'html.parser')
@@ -61,22 +48,14 @@ class TestClass(unittest.TestCase):
             'https://canvas.northwestern.edu/courses/7060/assignments/syllabus')
         self.assertTrue(valid_url)
 
-    def test_scraper_timeout(self):
-        # get_soupified_html should return None if the URL doesn't contain Canvas syllabus content
-        html = get_soupified_html(
-            'https://github.com/jasminjohal/canvas-instructure-syllabus-scraper/tree/master/base')
-        self.assertIsNone(html)
-        # is_canvas_page should return False if passed content is not actually Canvas page
-        self.assertFalse(is_canvas_page(html))
+    def test_is_canvas_page(self):
+        # 'https://github.com/jasminjohal/canvas-instructure-syllabus-scraper/tree/master/base' is technically
+        # a valid URL because it contains 'canvas' and 'syllabus' but # is_canvas_page should return False
+        # since it is not actually a Canvas page
+        with open('testing/html/github.html', encoding="utf8") as fp:
+            html = BeautifulSoup(fp, 'html.parser')
 
-    def test_scraper(self):
-        # every Canvas syllabus page has a div#syllabusContainer that contains the syllabus content
-        html = get_soupified_html(
-            'https://canvas.oregonstate.edu/courses/1792599/assignments/syllabus')
-        if html:
-            syllabus_container = html.find(
-                'div', {'id': 'syllabusContainer'})
-            self.assertIsNotNone(syllabus_container)
+        self.assertFalse(is_canvas_page(html))
 
     def test_course_name(self):
         # get_course_name should return the correct course name
