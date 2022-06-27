@@ -79,7 +79,9 @@ class TestClass(unittest.TestCase):
         # extract_date should pull the date from an HTML class and convert it
         # to a string in the form '%a %b %#d, %Y'
         task_date = extract_date(TestClass.row_with_date)
-        self.assertEqual(task_date, 'Fri Dec 3, 2021')
+        # allow for os date format discrepancies
+        self.assertTrue(
+            task_date == 'Fri Dec 3, 2021' or task_date == 'Fri Dec 03, 2021')
 
     def test_extract_date_without_date(self):
         # extract_date should return '' if there is no date class
