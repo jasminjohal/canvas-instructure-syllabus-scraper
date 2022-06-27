@@ -141,17 +141,18 @@ class TestClass(unittest.TestCase):
         df = df.rename(columns={'Dates': 'DATE'})
         format_date_column(df, 'todoist')
         # allow for os date format discrepancies (Todoist will be fine with either format)
+        first_value_in_date_column = df['DATE'].iat[0]
         self.assertTrue(
-            df['DATE'].iat[0] == 'Fri Dec 3, 2021 @ 11:59pm' or df['DATE'].iat[0] == 'Fri Dec 03, 2021 @ 11:59pm')
+            first_value_in_date_column == 'Fri Dec 3, 2021 @ 11:59pm' or first_value_in_date_column == 'Fri Dec 03, 2021 @ 11:59pm')
 
     def test_format_date_column_asana(self):
         # format_date_column should appropriately modify the date column depending on task management system
         df = TestClass.df.copy()
         df = df.rename(columns={'Dates': 'Due Date'})
         format_date_column(df, 'asana')
-        self.assertEqual(df['Due Date'].iat[0], '12/03/2021')
+        first_value_in_date_column = df['Due Date'].iat[0]
+        self.assertEqual(first_value_in_date_column, '12/03/2021')
 
 
 if __name__ == '__main__':
-    # unittest.main(verbosity=2)
-    unittest.main()
+    unittest.main()  # add verbosity=2 argument for more detail
