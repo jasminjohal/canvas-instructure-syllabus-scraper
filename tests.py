@@ -170,20 +170,6 @@ class TestClass(unittest.TestCase):
         format_date_column(df, 'asana')
         self.assertEqual(df['Due Date'].iat[0], '12/03/2021')
 
-    # def test_converter_for_all_osu_courses(self):
-    #     # end-to-end test
-    #     # verify that the scraped df for each course matches the expected format
-    #     for course_url in TestClass.course_urls:
-    #         syllabus = get_syllabus_content(course_url)
-    #         course_name = get_course_name(syllabus)
-    #         print(f"Testing {course_name}...")
-    #         df = convert_syllabus_to_df(syllabus)
-    #         # keep_default_na interprets empty cells as empty strings
-    #         expected_df = pd.read_csv(
-    #             f'./testing/df/{course_name}_df.csv', keep_default_na=False)
-
-    #         self.assertTrue(df.equals(expected_df))
-
 
 if __name__ == '__main__':
     # unittest.main(verbosity=2)
