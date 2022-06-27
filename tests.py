@@ -64,7 +64,7 @@ class TestClass(unittest.TestCase):
     def test_scraper_timeout(self):
         # get_soupified_html should return None if the URL doesn't contain Canvas syllabus content
         html = get_soupified_html(
-            'https://github.com/jasminjohal/canvas-syllabus-scraper/tree/master/base')
+            'https://github.com/jasminjohal/canvas-instructure-syllabus-scraper/tree/master/base')
         self.assertIsNone(html)
         # is_canvas_page should return False if passed content is not actually Canvas page
         self.assertFalse(is_canvas_page(html))
