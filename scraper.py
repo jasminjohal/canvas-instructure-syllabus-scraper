@@ -239,7 +239,7 @@ def process_df_for_tms(df, tms):
     return df
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     CS361_URL = 'https://oregonstate.instructure.com/courses/1877222/assignments/syllabus'
     CS372_URL = 'https://oregonstate.instructure.com/courses/1830291/assignments/syllabus'
 
