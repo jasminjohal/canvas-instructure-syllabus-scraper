@@ -98,7 +98,7 @@ class TestClass(unittest.TestCase):
         self.assertEqual(
             len(html.find_all("span", {"class": "screenreader_only"})), 0)
         self.assertEqual(
-            len(html.find_all("i", {"class": "icon-assignment"})), 0)
+            len(html.find_all("i", {"role": "presentation"})), 0)
 
     def test_get_syllabus_rows(self):
         # two_row_table has 2 tr but 1 is extraneous so should be removed by get_syllabus_rows

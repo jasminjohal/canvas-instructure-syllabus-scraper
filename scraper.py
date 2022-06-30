@@ -94,7 +94,7 @@ def remove_extraneous_rows(table):
         tr.decompose()
     for span in table.find_all('span', {'class': 'screenreader-only'}):
         span.decompose()
-    for icon in table.find_all('i', {'class': 'icon-assignment'}):
+    for icon in table.find_all('i', {'role': 'presentation'}):
         icon.decompose()
 
 
