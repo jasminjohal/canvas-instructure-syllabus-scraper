@@ -2,3 +2,4 @@ venv/
 bugs/
 *.pyc
 .env
+desktop.ini
