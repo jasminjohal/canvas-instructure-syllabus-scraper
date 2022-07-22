@@ -29,15 +29,20 @@ def is_valid_url(url):
 def setup_driver():
     """Return an instance of ChromeDriver"""
     options = webdriver.ChromeOptions()
-    options.binary_location = os.environ.get('GOOGLE_CHROME_BIN', None)
     options.add_argument('--headless')
     # disable console warnings/errors
     options.add_argument('--log-level=3')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
-    driver = webdriver.Chrome(executable_path=os.environ.get(
-        'CHROMEDRIVER_PATH'), options=options)
+
+    if os.environ.get('HEROKU'):
+        options.binary_location = os.environ.get(
+            'GOOGLE_CHROME_BIN')
+        driver = webdriver.Chrome(executable_path=os.environ.get(
+            'CHROMEDRIVER_PATH'), options=options)
+    else:
+        driver = webdriver.Chrome(options=options)
 
     return driver
 
