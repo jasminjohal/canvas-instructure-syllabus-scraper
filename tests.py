@@ -264,6 +264,32 @@ class TestClass(unittest.TestCase):
         self.assertEqual(list(processed_df.columns),
                          columns_with_correct_order)
 
+    def test_setup_driver(self):
+        # ensure driver is properly setup by visiting a URL and comparing it to driver's current_url property
+        driver = setup_driver()
+        URL = "https://www.google.com/"
+        try:
+            driver.get(URL)
+            visited_url = driver.current_url
+        finally:
+            driver.quit()
+        self.assertTrue(URL in visited_url)
+
+    def test_scraper(self):
+        # every Canvas syllabus page has a div#syllabusContainer that contains the syllabus content
+        html = get_soupified_html(
+            'https://canvas.oregonstate.edu/courses/1792599/assignments/syllabus')
+        if html:
+            syllabus_container = html.find(
+                'div', {'id': 'syllabusContainer'})
+            self.assertIsNotNone(syllabus_container)
+
+    def test_scraper_timeout(self):
+        # get_soupified_html should return None if the URL doesn't contain Canvas syllabus content
+        html = get_soupified_html(
+            'https://github.com/jasminjohal/canvas-instructure-syllabus-scraper/tree/master/base')
+        self.assertIsNone(html)
+
 
 if __name__ == '__main__':
     unittest.main()  # add verbosity=2 argument for more detail
